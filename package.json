@@ -1,0 +1,29 @@
+{
+  "name": "linkpe",
+  "version": "1.0.0",
+  "description": "Free UPI payment link generator with short links, UPI app and QR payment options",
+  "main": "index.html",
+  "scripts": {
+    "start": "node server.js 8081"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mdislamair/linkpe.git"
+  },
+  "keywords": [
+    "upi",
+    "payment-link",
+    "qr",
+    "india",
+    "github-pages"
+  ],
+  "author": "Md Islam",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/mdislamair/linkpe/issues"
+  },
+  "homepage": "https://github.com/mdislamair/linkpe#readme",
+  "dependencies": {
+    "express": "^4.22.1"
+  }
+}

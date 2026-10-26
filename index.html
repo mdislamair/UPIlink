@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Pay with UPI | LinkPe</title>
+	<meta name="title" content="Pay with UPI | LinkPe">
+	<meta name="description" content="Pay securely with any UPI app or by scanning a QR code. Payment links made with LinkPe.">
+	<meta name="theme-color" content="#138808">
+	<link rel="icon" href="favicon.ico">
+	<link rel="fluid-icon" href="https://raw.githubusercontent.com/mdislamair/linkpe/main/img/linkpe.png" title="LinkPe">
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="https://mdislamair.github.io/linkpe/">
+	<meta property="og:title" content="Pay with UPI | LinkPe">
+	<meta property="og:description" content="Pay securely with any UPI app or by scanning a QR code.">
+	<meta property="og:image" content="https://raw.githubusercontent.com/mdislamair/linkpe/main/img/linkpe.png">
+	<!-- Twitter -->
+	<meta property="twitter:card" content="summary_large_image">
+	<meta property="twitter:url" content="https://mdislamair.github.io/linkpe/">
+	<meta property="twitter:title" content="Pay with UPI | LinkPe">
+	<meta property="twitter:description" content="Pay securely with any UPI app or by scanning a QR code.">
+	<meta property="twitter:image" content="https://raw.githubusercontent.com/mdislamair/linkpe/main/img/linkpe.png">
+	<link rel="stylesheet" href="css/main.css">
+	<!-- LinkPe was created by Pt. Prashant Tripathi (MIT). This fork is developed by Md Islam, https://github.com/mdislamair -->
+</head>
+
+<body>
+	<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+		<symbol id="i-phone" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+		<symbol id="i-qr" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h3v3h-3zM20 14v.01M14 20h.01M17 20h4v-3"/></symbol>
+		<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+		<symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+	</svg>
+
+	<noscript>
+		<main class="card"><p class="lead">Please turn on JavaScript to see this payment page.</p></main>
+	</noscript>
+
+	<main class="card" id="pay" hidden>
+		<a class="brand" href="linkpe.html" aria-label="LinkPe"><img src="img/logo.png" alt="LinkPe"></a>
+
+		<section class="payee">
+			<div class="avatar" id="avatar" aria-hidden="true"></div>
+			<div class="payee-info">
+				<p class="label">Pay to</p>
+				<h1 id="payee-name"></h1>
+				<p class="upi-id" id="payee-upi"></p>
+			</div>
+		</section>
+
+		<div class="amount" id="amount-box">
+			<div class="value" id="amount-value" hidden><small>&#8377;</small><span id="amount"></span></div>
+			<div class="note" id="amount-note" hidden>You'll enter the amount in your UPI app</div>
+		</div>
+
+		<div class="tabs" role="tablist" aria-label="Choose how to pay">
+			<button class="tab" id="tab-apps" role="tab" aria-selected="true" aria-controls="panel-apps">
+				<svg class="ico"><use href="#i-phone"/></svg> UPI apps
+			</button>
+			<button class="tab" id="tab-qr" role="tab" aria-selected="false" aria-controls="panel-qr" tabindex="-1">
+				<svg class="ico"><use href="#i-qr"/></svg> Scan QR
+			</button>
+		</div>
+
+		<!-- Option 1: UPI apps -->
+		<section class="panel" id="panel-apps" role="tabpanel" aria-labelledby="tab-apps">
+			<a class="btn" id="pay-now" href="#">
+				Pay with any UPI app <svg class="ico"><use href="#i-arrow"/></svg>
+			</a>
+			<p class="hint">Opens the UPI apps installed on this phone.</p>
+
+			<p class="apps-title">Or pick an app</p>
+			<div class="app-row">
+				<a class="chip" id="app-gpay" href="#"><span class="logo logo-gpay" role="img" aria-label="Google Pay"></span>GPay</a>
+				<a class="chip" id="app-phonepe" href="#"><span class="logo logo-phonepe" role="img" aria-label="PhonePe"></span>PhonePe</a>
+				<a class="chip" id="app-paytm" href="#"><span class="logo logo-paytm" role="img" aria-label="Paytm"></span>Paytm</a>
+				<a class="chip" id="app-bhim" href="#"><span class="logo logo-bhim" role="img" aria-label="BHIM"></span>BHIM</a>
+			</div>
+			<p class="hint">Nothing happens? That app isn't installed. Use the green button.</p>
+		</section>
+
+		<!-- Option 2: QR -->
+		<section class="panel" id="panel-qr" role="tabpanel" aria-labelledby="tab-qr" hidden>
+			<div class="qr-wrap"><canvas id="qr" width="520" height="520" aria-label="UPI payment QR code"></canvas></div>
+			<p class="hint">Open any UPI app on another phone, tap <b>Scan</b>, and point it here.</p>
+			<div style="margin-top:14px">
+				<button type="button" class="btn btn-secondary" id="btn-download">
+					<svg class="ico"><use href="#i-download"/></svg> Download QR
+				</button>
+			</div>
+		</section>
+
+		<a class="create-own" href="linkpe.html">Create your own payment link</a>
+
+		<footer class="footer">
+			<p>Developed by <a href="https://github.com/mdislamair" target="_blank" rel="noopener">Md Islam</a></p>
+			<p class="small">Free &amp; open source &middot; based on <a href="https://github.com/PtPrashantTripathi/linkpe" target="_blank" rel="noopener">LinkPe</a> (MIT)</p>
+		</footer>
+	</main>
+
+	<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+	<script src="qrious/qrious.min.js"></script>
+	<script src="js/linkpe.js"></script>
+	<script>
+		(function () {
+			var $ = function (id) { return document.getElementById(id); };
+
+			var d = LinkPe.readParams(location.search);
+			if (!LinkPe.isValidUpi(d.pa) || !LinkPe.isValidAmount(d.am)) {
+				location.replace("linkpe.html?error");
+				return;
+			}
+			d.am = LinkPe.normalizeAmount(d.am);
+
+			/* ---- who gets paid (textContent only: the values come from the URL) ---- */
+			var who = d.pn || d.pa;
+			document.title = "Pay " + who + " | LinkPe";
+			$("payee-name").textContent = who;
+			$("payee-upi").textContent = d.pn ? d.pa : "";
+			$("payee-upi").hidden = !d.pn;
+			$("avatar").textContent = who.replace(/[^A-Za-z0-9]/g, "").charAt(0).toUpperCase() || "₹";
+			if (d.am) {
+				$("amount").textContent = d.am;
+				$("amount-value").hidden = false;
+			} else {
+				$("amount-note").hidden = false;
+			}
+
+			/* ---- payment links ---- */
+			var query = LinkPe.buildQuery(d, true);
+			var upi = "upi://pay?" + query;
+			$("pay-now").href = upi;
+			$("app-bhim").href = upi;
+			$("app-gpay").href = "tez://upi/pay?" + query;
+			$("app-phonepe").href = "phonepe://pay?" + query;
+			$("app-paytm").href = "paytmmp://pay?" + query;
+
+			/* ---- QR ---- */
+			var canvas = $("qr");
+			new QRious({ element: canvas, value: upi, size: 520, padding: 24, level: "M", background: "#ffffff", foreground: "#000000" });
+
+			$("btn-download").addEventListener("click", function () {
+				canvas.toBlob(function (blob) {
+					var a = document.createElement("a");
+					a.href = URL.createObjectURL(blob);
+					a.download = "linkpe-qr-" + (who.replace(/[^A-Za-z0-9._-]+/g, "-").replace(/^-+|-+$/g, "") || "payment") + ".png";
+					document.body.appendChild(a);
+					a.click();
+					document.body.removeChild(a);
+					setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+					LinkPe.toast("QR saved");
+				});
+			});
+
+			/* ---- tabs ---- */
+			var tabs = [$("tab-apps"), $("tab-qr")];
+			function select(tab, focus) {
+				tabs.forEach(function (t) {
+					var on = t === tab;
+					t.setAttribute("aria-selected", on);
+					t.tabIndex = on ? 0 : -1;
+					$(t.getAttribute("aria-controls")).hidden = !on;
+				});
+				if (focus) tab.focus();
+			}
+			tabs.forEach(function (t, i) {
+				t.addEventListener("click", function () { select(t); });
+				t.addEventListener("keydown", function (e) {
+					if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+						e.preventDefault();
+						select(tabs[(i + 1) % tabs.length], true);
+					}
+				});
+			});
+
+			// Phones open an app; computers are better served by the QR code.
+			var onPhone = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+			select(onPhone ? tabs[0] : tabs[1]);
+
+			$("pay").hidden = false;
+		})();
+	</script>
+</body>
+
+</html>
