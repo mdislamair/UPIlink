@@ -343,6 +343,28 @@ h1 {
   background: var(--green-soft);
 }
 
+.badge-btn {
+  margin-right: 6px;
+  color: var(--green-dark);
+  background: var(--green-soft);
+  border: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.badge-btn:hover {
+  background: #d6efd2;
+}
+
+.tip {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--muted);
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
 .link-box {
   display: flex;
   gap: 8px;
@@ -567,6 +589,69 @@ h1 {
   width: 100%;
   height: auto;
   border-radius: 8px;
+}
+
+/* ---------- Manual payment help ---------- */
+
+.help {
+  margin-top: 18px;
+  padding: 0 14px 6px;
+  border: 1.5px solid var(--line);
+  border-radius: 14px;
+}
+
+.help summary {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.help p,
+.help ol {
+  margin: 0 0 10px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.help ol {
+  padding-left: 20px;
+}
+
+.copy-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  padding: 10px 12px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.copy-row > div {
+  min-width: 0;
+}
+
+.copy-row .k {
+  display: block;
+  font-size: 11.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.copy-row b {
+  overflow-wrap: anywhere;
+}
+
+.btn-small {
+  width: auto;
+  min-height: 40px;
+  padding: 0 16px;
+  font-size: 14px;
 }
 
 /* ---------- Footer ---------- */
