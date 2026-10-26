@@ -1,0 +1,13 @@
+name = "upilink-go"
+main = "shortener.js"
+compatibility_date = "2025-01-01"
+
+[vars]
+SITE_ORIGIN = "https://mdislamair.github.io"
+SITE_PATH = "/UPIlink/"
+
+# Create the store first:  npx wrangler kv namespace create LINKS
+# then paste the id it prints here.
+[[kv_namespaces]]
+binding = "LINKS"
+id = "PASTE_YOUR_KV_NAMESPACE_ID_HERE"
