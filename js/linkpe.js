@@ -47,7 +47,7 @@
     };
   }
 
-  // The folder this page lives in, e.g. https://you.github.io/linkpe/
+  // The folder this page lives in, e.g. https://you.github.io/UPIlink/
   function baseUrl() {
     return new URL("./", global.location.href).href;
   }
@@ -87,11 +87,36 @@
   }
 
   /* ---------- Short links ---------- */
-  // LinkPe has no server, so short links come from free public shorteners.
-  // They are all asked at once and the first answer wins. If none answer
-  // (offline, rate-limited, blocked), the caller keeps the normal link.
+  // Order of preference:
+  //   1. your own shortener (worker/shortener.js on Cloudflare, free) if
+  //      js/config.js points to it. This is the reliable option.
+  //   2. free public shorteners (is.gd, v.gd, TinyURL), asked all at once.
+  // Each round is tried twice. If everything fails the caller keeps the
+  // normal link, which always works.
 
-  var SHORT_OK = /^https:\/\/(is\.gd|v\.gd|tinyurl\.com)\/[\w-]+$/;
+  var cfg = global.LINKPE_CONFIG || {};
+  var OWN = String(cfg.shortenerUrl || "").replace(/\/+$/, "");
+  var PUBLIC_OK = /^https:\/\/(is\.gd|v\.gd|tinyurl\.com)\/[\w-]+$/;
+
+  function isShort(s) {
+    if (PUBLIC_OK.test(s)) return true;
+    return !!OWN && s.indexOf(OWN + "/") === 0 && /^[0-9A-Za-z]{7}$/.test(s.slice(OWN.length + 1));
+  }
+
+  function own(url, signal) {
+    return fetch(OWN + "/api/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url }),
+      signal: signal,
+    })
+      .then(function (r) {
+        return r.json();
+      })
+      .then(function (d) {
+        return d.short;
+      });
+  }
 
   function fromJson(host) {
     return function (url, signal) {
@@ -105,7 +130,7 @@
     };
   }
 
-  var providers = [
+  var publicProviders = [
     fromJson("is.gd"),
     fromJson("v.gd"),
     function (url, signal) {
@@ -114,6 +139,39 @@
       });
     },
   ];
+
+  // Ask every provider at once; the first valid answer wins.
+  function race(list, url, ms) {
+    var ctl = new AbortController();
+    var timer = setTimeout(function () {
+      ctl.abort();
+    }, ms);
+    var attempts = list.map(function (p) {
+      return p(url, ctl.signal).then(function (short) {
+        short = String(short || "").trim();
+        if (!isShort(short)) throw new Error("bad response");
+        return short;
+      });
+    });
+    return Promise.any(attempts).then(
+      function (short) {
+        clearTimeout(timer);
+        ctl.abort(); // drop the slower requests
+        return short;
+      },
+      function () {
+        clearTimeout(timer);
+        throw new Error("no short link");
+      }
+    );
+  }
+
+  function round(url) {
+    if (!OWN) return race(publicProviders, url, 5000);
+    return race([own], url, 6000).catch(function () {
+      return race(publicProviders, url, 5000);
+    });
+  }
 
   function canShorten() {
     var l = global.location;
@@ -128,40 +186,28 @@
   function shorten(longUrl) {
     try {
       var hit = global.localStorage.getItem(cacheKey(longUrl));
-      if (hit && SHORT_OK.test(hit)) return Promise.resolve(hit);
+      if (hit && isShort(hit)) return Promise.resolve(hit);
     } catch (e) {
       /* storage can be blocked; carry on */
     }
 
-    var ctl = new AbortController();
-    var timer = setTimeout(function () {
-      ctl.abort();
-    }, 7000);
-
-    var attempts = providers.map(function (p) {
-      return p(longUrl, ctl.signal).then(function (short) {
-        short = String(short || "").trim();
-        if (!SHORT_OK.test(short)) throw new Error("bad response");
-        return short;
-      });
-    });
-
-    return Promise.any(attempts).then(
-      function (short) {
-        clearTimeout(timer);
-        ctl.abort(); // drop the slower requests
+    return round(longUrl)
+      .catch(function () {
+        // one more go after a short pause: most failures are momentary
+        return new Promise(function (resolve) {
+          setTimeout(resolve, 1200);
+        }).then(function () {
+          return round(longUrl);
+        });
+      })
+      .then(function (short) {
         try {
           global.localStorage.setItem(cacheKey(longUrl), short);
         } catch (e) {
           /* ignore */
         }
         return short;
-      },
-      function () {
-        clearTimeout(timer);
-        throw new Error("no short link");
-      }
-    );
+      });
   }
 
   global.LinkPe = {
